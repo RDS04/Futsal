@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Kalender - Futsal Booking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold text-gray-800 mb-8">Test Kalender Jadwal Lapangan</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Instruksi Testing:</h2>
+            <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                <li>Buka salah satu dashboard: Bypass, Ulak Karang, atau Batu Sangkar</li>
+                <li>Kalender akan otomatis memuat data booking dari API</li>
+                <li>Cari tanggal 6 - harus berwarna <span class="bg-red-400 text-white px-2 rounded">MERAH</span></li>
+                <li>Klik tanggal 6 - akan menampilkan detail booking (nama pemesan, lapangan, jam)</li>
+                <li>Cek di Browser Console (F12) untuk melihat log debug</li>
+            </ol>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Kalender Preview -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Preview Kalender</h3>
+                <div class="flex justify-between items-center mb-4">
+                    <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">← Sebelumnya</button>
+                    <h4 class="text-lg font-bold" id="monthYear">Februari 2026</h4>
+                    <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Selanjutnya →</button>
+                </div>
+                
+                <div class="grid grid-cols-7 gap-2 mb-4">
+                    <div class="text-center font-bold text-gray-700 text-sm">Min</div>
+                    <div class="text-center font-bold text-gray-700 text-sm">Sen</div>
+                    <div class="text-center font-bold text-gray-700 text-sm">Sel</div>
+                    <div class="text-center font-bold text-gray-700 text-sm">Rab</div>
+                    <div class="text-center font-bold text-gray-700 text-sm">Kam</div>
+                    <div class="text-center font-bold text-gray-700 text-sm">Jum</div>
+                    <div class="text-center font-bold text-gray-700 text-sm">Sab</div>
+                </div>
+                
+                <div class="grid grid-cols-7 gap-1" id="calendarGrid">
+                    <!-- Calendar akan di-generate oleh JavaScript -->
+                </div>
+            </div>
+
+            <!-- Detail Booking -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Keterangan & Detail</h3>
+                <div class="space-y-4 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 bg-green-400 rounded"></div>
+                        <span class="text-gray-700">Tersedia (Tidak ada booking)</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 bg-red-400 rounded"></div>
+                        <span class="text-gray-700">Terboking (Ada booking)</span>
+                    </div>
+                </div>
+
+                <div class="border-t pt-4">
+                    <h4 class="font-bold text-gray-800 mb-3">Detail Tanggal</h4>
+                    <div id="dateDetail" class="text-sm text-gray-600 space-y-2">
+                        <p class="text-gray-400">Klik tanggal di kalender untuk melihat detail</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Data Display -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Data Booking Test (Hardcoded)</h3>
+            <div class="bg-blue-50 p-4 rounded border border-blue-200">
+                <p class="font-semibold text-blue-900 mb-2">Bookings untuk tanggal 6 February 2026 (Bypass):</p>
+                <ul class="space-y-2 text-sm text-blue-800">
+                    <li>✓ Test Booking Bypass | 10:00 - 12:00 | Lapangan 1</li>
+                    <li>✓ Test Booking 2 - Afternoon | 14:00 - 16:00 | Lapangan 1</li>
+                    <li>✓ Test Booking 3 - Evening | 18:00 - 20:00 | Lapangan 1</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ✅ Simulasi region variable
+        const region = 'bypass';
+        
+        let currentMonth = 1; // February (0-indexed)
+        let currentYear = 2026;
+        let scheduleData = {
+            '2026-02-06': [
+                {
+                    status: 'booked',
+                    jam_mulai: '10:00',
+                    jam_selesai: '12:00',
+                    lapangan_id: 1,
+                    lapangan_nama: 'Lapangan 1',
+                    nama_pemesan: 'Test Booking Bypass'
+                },
+                {
+                    status: 'booked',
+                    jam_mulai: '14:00',
+                    jam_selesai: '16:00',
+                    lapangan_id: 1,
+                    lapangan_nama: 'Lapangan 1',
+                    nama_pemesan: 'Test Booking 2 - Afternoon'
+                },
+                {
+                    status: 'booked',
+                    jam_mulai: '18:00',
+                    jam_selesai: '20:00',
+                    lapangan_id: 1,
+                    lapangan_nama: 'Lapangan 1',
+                    nama_pemesan: 'Test Booking 3 - Evening'
+                }
+            ]
+        };
+
+        function renderCalendar() {
+            const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+
+            document.getElementById('monthYear').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+
+            for (let i = 0; i < firstDay; i++) {
+                calendarGrid.innerHTML += '<div></div>';
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const formattedDay = String(day).padStart(2, '0');
+                const formattedMonth = String(currentMonth + 1).padStart(2, '0');
+                const dateKey = `${currentYear}-${formattedMonth}-${formattedDay}`;
+                
+                const isBooked = scheduleData[dateKey] && scheduleData[dateKey].length > 0;
+                const bgColor = isBooked ? 'bg-red-400 hover:bg-red-500' : 'bg-green-400 hover:bg-green-500';
+
+                calendarGrid.innerHTML += `
+                    <button onclick="showDateDetail('${dateKey}')" 
+                        class="p-3 rounded text-white font-semibold text-sm ${bgColor} transition cursor-pointer">
+                        ${day}
+                    </button>
+                `;
+            }
+            
+            console.log('✓ Kalender di-render untuk', monthNames[currentMonth], currentYear);
+        }
+
+        function showDateDetail(dateKey) {
+            const [year, month, day] = dateKey.split('-');
+            const bookings = scheduleData[dateKey] || [];
+
+            const monthNames = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+
+            let detailHTML = `<p class="font-bold text-gray-800 mb-3">${parseInt(day)} ${monthNames[parseInt(month)]} ${year}</p>`;
+
+            if (bookings.length === 0) {
+                detailHTML += '<p class="text-green-600 font-semibold mt-2">✓ Semua lapangan kosong</p>';
+            } 
+            else {
+                bookings.forEach((booking, idx) => {
+                    detailHTML += `<div class="mt-2 p-3 bg-red-100 border-l-4 border-red-500 rounded">
+                        <p class="text-red-700 font-semibold">${booking.lapangan_nama}</p>
+                        <p class="text-red-600 text-sm">Pemesan: ${booking.nama_pemesan}</p>
+                        <p class="text-red-600 text-sm">Jam: ${booking.jam_mulai} - ${booking.jam_selesai}</p>
+                    </div>`;
+                });
+            }
+            document.getElementById('dateDetail').innerHTML = detailHTML;
+            console.log(`✓ Detail ditampilkan untuk ${dateKey}:`, bookings);
+        }
+
+        // Render kalender saat halaman dimuat
+        window.addEventListener('load', function() {
+            renderCalendar();
+            console.log('✓ Kalender page loaded');
+            console.log('✓ Region:', region);
+            console.log('✓ Schedule Data:', scheduleData);
+        });
+    </script>
+</body>
+</html>

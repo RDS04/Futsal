@@ -1,0 +1,383 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Sidebar Scroll Fix */
+.layout-fixed .app-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 260px;
+    max-height: 100vh;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.layout-fixed .app-sidebar .sidebar-wrapper {
+    height: calc(100vh - 80px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* Header positioning */
+.layout-fixed .app-header {
+    position: fixed;
+    top: 0;
+    left: 260px;
+    right: 0;
+    z-index: 999;
+}
+
+/* Wrapper adjustments */
+.layout-fixed .wrapper {
+    padding-top: 60px;
+}
+
+/* Content wrapper positioning */
+.layout-fixed .content-wrapper {
+    margin-left: 260px;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+
+/* Scrollbar styling untuk sidebar */
+.sidebar-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sidebar-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.sidebar-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* ===== SIDEBAR MENU STYLING ===== */
+
+/* Sidebar Menu Items */
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+}
+
+/* Menu Header */
+.nav-header {
+    padding: 0.75rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 0.75rem;
+}
+
+/* Nav Item */
+.nav-item {
+    margin-bottom: 0;
+}
+
+/* Nav Link */
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+    gap: 0.75rem;
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-left-color: #0d6efd;
+}
+
+.nav-link.active {
+    background-color: rgba(13, 110, 253, 0.15);
+    color: #fff;
+    border-left-color: #0d6efd;
+    font-weight: 600;
+}
+
+/* Nav Icon */
+.nav-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    min-width: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Nav Link Icon */
+.nav-link svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    stroke-width: 1.5;
+}
+
+/* Nav Link Text */
+.nav-link p {
+    margin: 0;
+    flex: 1;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Nav Arrow */
+.nav-arrow {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+    font-size: 0.75rem;
+}
+
+.nav-link.collapsed .nav-arrow {
+    transform: rotate(0deg);
+}
+
+.nav-link:not(.collapsed) .nav-arrow {
+    transform: rotate(90deg);
+}
+
+/* Collapse Animation */
+.nav-treeview.collapse {
+    display: none !important;
+    overflow: hidden;
+}
+
+.nav-treeview.collapse.show {
+    display: block !important;
+    animation: slideDown 0.35s ease-out;
+}
+
+.nav-treeview.collapsing {
+    display: block !important;
+    overflow: hidden;
+    animation: slideDown 0.35s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        max-height: 1000px;
+        transform: translateY(0);
+    }
+}
+
+/* Smoothness for dropdown rotation */
+.nav-link[data-bs-toggle="collapse"] {
+    cursor: pointer !important;
+    user-select: none;
+    position: relative;
+}
+
+.nav-link[data-bs-toggle="collapse"] .nav-arrow {
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+
+/* Rotate arrow on expand */
+.nav-link[data-bs-toggle="collapse"][aria-expanded="true"] .nav-arrow {
+    transform: rotate(90deg);
+}
+
+.nav-link[data-bs-toggle="collapse"][aria-expanded="false"] .nav-arrow {
+    transform: rotate(0deg);
+}
+
+/* Highlight parent when submenu is expanded */
+.nav-link[data-bs-toggle="collapse"][aria-expanded="true"] {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left-color: #0d6efd;
+    color: #fff !important;
+}
+
+/* Active submenu indicator */
+.nav-treeview .nav-link.active {
+    position: relative;
+    background-color: rgba(13, 110, 253, 0.2);
+    color: #fff;
+    border-left-color: #0d6efd;
+    font-weight: 600;
+}
+
+/* Prevent text selection on collapse button */
+.nav-link[data-bs-toggle="collapse"],
+.nav-link[data-bs-toggle="collapse"] * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Sub Menu Items */
+.nav-treeview .nav-item {
+    margin-bottom: 0;
+}
+
+.nav-treeview .nav-link {
+    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.65);
+    border-left: 2px solid transparent;
+}
+
+.nav-treeview .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border-left-color: #80b9ff;
+}
+
+.nav-treeview .nav-link.active {
+    background-color: rgba(13, 110, 253, 0.2);
+    color: #fff;
+    border-left-color: #0d6efd;
+    font-weight: 600;
+}
+
+/* Sub Menu Icon */
+.nav-treeview .nav-icon {
+    width: 1rem;
+    height: 1rem;
+    min-width: 1rem;
+    font-size: 0.75rem;
+}
+
+/* Brand Link */
+.brand-link {
+    padding: 0.75rem 0.5rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.brand-link:hover {
+    border-bottom-color: #0d6efd;
+}
+
+.brand-text {
+    font-size: 1.1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .layout-fixed .app-sidebar {
+        width: 220px;
+    }
+    
+    .layout-fixed .app-header {
+        left: 220px;
+    }
+    
+    .layout-fixed .content-wrapper {
+        margin-left: 220px;
+    }
+    
+    .nav-link {
+        padding: 0.6rem 0.75rem;
+    }
+}
+
+/* Collapse Animation */
+.nav-treeview.collapse {
+    display: none;
+    overflow: hidden;
+    max-height: 0;
+}
+
+.nav-treeview.collapse.show {
+    display: block;
+    max-height: 1000px;
+    animation: slideDown 0.35s ease-out;
+}
+
+.nav-treeview.collapsing {
+    display: block;
+    overflow: hidden;
+    animation: slideDown 0.35s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        max-height: 1000px;
+        transform: translateY(0);
+    }
+}
+
+/* Smoothness for dropdown rotation */
+.nav-link[data-bs-toggle="collapse"] {
+    cursor: pointer !important;
+    user-select: none;
+    position: relative;
+}
+
+.nav-link[data-bs-toggle="collapse"] .nav-arrow {
+    transition: transform 0.3s ease;
+    display: inline-block;
+    margin-left: auto;
+}
+
+/* Rotate arrow on expand */
+.nav-link[data-bs-toggle="collapse"][aria-expanded="true"] .nav-arrow {
+    transform: rotate(90deg);
+}
+
+.nav-link[data-bs-toggle="collapse"][aria-expanded="false"] .nav-arrow {
+    transform: rotate(0deg);
+}
+
+/* Highlight parent when submenu is expanded */
+.nav-link[data-bs-toggle="collapse"][aria-expanded="true"] {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left-color: #0d6efd;
+    color: #fff !important;
+}
+
+/* Active submenu indicator */
+.nav-treeview .nav-link.active {
+    position: relative;
+    background-color: rgba(13, 110, 253, 0.2);
+    color: #fff;
+    border-left-color: #0d6efd;
+    font-weight: 600;
+}
+
+/* Prevent text selection on collapse button */
+.nav-link[data-bs-toggle="collapse"],
+.nav-link[data-bs-toggle="collapse"] * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}

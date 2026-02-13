@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Response</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-4xl font-bold text-gray-800 mb-8">Debug: Test API & Calendar</h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Raw API Response -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">API Response (Raw JSON)</h2>
+                <div id="apiResponse" class="bg-gray-900 text-green-400 p-4 rounded font-mono text-sm overflow-auto h-96">
+                    Loading...
+                </div>
+            </div>
+
+            <!-- Calendar Preview -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Calendar Preview</h2>
+                <div class="flex justify-between items-center mb-4">
+                    <button onclick="prevMonth()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">‚Üê</button>
+                    <h3 id="monthYear" class="text-xl font-bold">-</h3>
+                    <button onclick="nextMonth()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">‚Üí</button>
+                </div>
+                
+                <div class="grid grid-cols-7 gap-1 mb-4">
+                    <div class="text-center font-bold text-xs">Min</div>
+                    <div class="text-center font-bold text-xs">Sen</div>
+                    <div class="text-center font-bold text-xs">Sel</div>
+                    <div class="text-center font-bold text-xs">Rab</div>
+                    <div class="text-center font-bold text-xs">Kam</div>
+                    <div class="text-center font-bold text-xs">Jum</div>
+                    <div class="text-center font-bold text-xs">Sab</div>
+                </div>
+                
+                <div class="grid grid-cols-7 gap-1" id="calendarGrid"></div>
+            </div>
+
+            <!-- Detail Booking -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Detail Tanggal</h2>
+                <div id="dateDetail" class="bg-blue-50 p-4 rounded border border-blue-200 text-sm">
+                    Klik tanggal di kalender
+                </div>
+            </div>
+
+            <!-- Console Log -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Console Output</h2>
+                <div id="consoleLog" class="bg-black text-gray-300 p-4 rounded font-mono text-xs overflow-auto h-96 whitespace-pre-wrap">
+                    [Console logs akan muncul di sini]
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const region = 'bypass';
+        let currentMonth = 1; // February
+        let currentYear = 2026;
+        let scheduleData = {};
+        let consoleLogs = [];
+
+        // Override console.log untuk capture logs
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            consoleLogs.push(message);
+            updateConsoleLog();
+        };
+
+        function updateConsoleLog() {
+            const consoleElement = document.getElementById('consoleLog');
+            consoleElement.textContent = consoleLogs.join('\n');
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+        }
+
+        async function loadBookingData() {
+            try {
+                console.log(`Ì¥Ñ Loading bookings for ${region}...`);
+                console.log(`Ì≥Ö Month: ${currentMonth + 1}, Year: ${currentYear}`);
+                
+                const url = `/api/booked-slots?tahun=${currentYear}&bulan=${currentMonth + 1}&region=${region}`;
+                console.log(`Ì≥° API URL: ${url}`);
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const bookings = await response.json();
+                console.log(`‚úÖ Response received: ${bookings.length} bookings`);
+                console.log(bookings);
+                
+                document.getElementById('apiResponse').textContent = JSON.stringify(bookings, null, 2);
+                
+                scheduleData = {};
+                bookings.forEach(booking => {
+                    const dateKey = booking.tanggal;
+                    if (!scheduleData[dateKey]) {
+                        scheduleData[dateKey] = [];
+                    }
+                    scheduleData[dateKey].push(booking);
+                    console.log(`  Ì≥å ${dateKey}: ${booking.nama_pemesan} (${booking.jam_mulai}-${booking.jam_selesai})`);
+                });
+                
+                renderCalendar();
+                console.log(`‚úÖ Calendar rendered`);
+            } catch (error) {
+                console.log(`‚ùå Error: ${error.message}`);
+                document.getElementById('apiResponse').textContent = `ERROR: ${error.message}`;
+            }
+        }
+
+        function renderCalendar() {
+            const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+
+            document.getElementById('monthYear').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+
+            for (let i = 0; i < firstDay; i++) {
+                calendarGrid.innerHTML += '<div></div>';
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const formattedDay = String(day).padStart(2, '0');
+                const formattedMonth = String(currentMonth + 1).padStart(2, '0');
+                const dateKey = `${currentYear}-${formattedMonth}-${formattedDay}`;
+                
+                const isBooked = scheduleData[dateKey] && scheduleData[dateKey].length > 0;
+                const bgColor = isBooked ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600';
+
+                calendarGrid.innerHTML += `
+                    <button onclick="showDateDetail('${dateKey}')" 
+                        class="p-2 rounded text-white font-semibold text-sm ${bgColor} transition cursor-pointer">
+                        ${day}
+                    </button>
+                `;
+            }
+        }
+
+        function showDateDetail(dateKey) {
+            const bookings = scheduleData[dateKey] || [];
+            const detailDiv = document.getElementById('dateDetail');
+            
+            let html = `<p class="font-bold mb-3">${dateKey}</p>`;
+            
+            if (bookings.length === 0) {
+                html += '<p class="text-green-600">‚úì Lapangan Kosong</p>';
+            } else {
+                html += `<p class="text-red-600 font-bold mb-2">${bookings.length} Booking(s):</p>`;
+                bookings.forEach((b, i) => {
+                    html += `<div class="bg-red-100 p-2 rounded mb-2 border-l-4 border-red-500">
+                        <p class="font-semibold text-red-800">${b.lapangan_nama}</p>
+                        <p class="text-red-700 text-sm">Pemesan: ${b.nama_pemesan}</p>
+                        <p class="text-red-700 text-sm">Jam: ${b.jam_mulai} - ${b.jam_selesai}</p>
+                    </div>`;
+                });
+            }
+            
+            detailDiv.innerHTML = html;
+        }
+
+        function prevMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            loadBookingData();
+        }
+
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            loadBookingData();
+        }
+
+        // Load data saat halaman dimuat
+        window.addEventListener('load', loadBookingData);
+    </script>
+</body>
+</html>
