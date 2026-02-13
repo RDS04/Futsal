@@ -14,9 +14,8 @@
               <tr>
                 <th class="px-4 py-4 font-bold text-slate-800"><i class="fas fa-map-pin mr-2 text-blue-600"></i>Region</th>
                 <th class="px-4 py-4 text-center font-bold text-slate-800"><i class="fas fa-futbol mr-2 text-orange-600"></i>Lapangan</th>
-                <th class="px-4 py-4 text-center font-bold text-slate-800"><i class="fas fa-check-circle mr-2 text-green-600"></i>Aktif</th>
                 <th class="px-4 py-4 text-center font-bold text-slate-800"><i class="fas fa-calendar-check mr-2 text-indigo-600"></i>Booking</th>
-                <th class="px-4 py-4 text-center font-bold text-slate-800"><i class="fas fa-thumbs-up mr-2 text-emerald-600"></i>Confirmed</th>
+        
                 <th class="px-4 py-4 text-center font-bold text-slate-800"><i class="fas fa-calendar-star mr-2 text-pink-600"></i>Event</th>
                 <th class="px-4 py-4 text-center font-bold text-slate-800"><i class="fas fa-images mr-2 text-purple-600"></i>Slider</th>
                 <th class="px-4 py-4 text-center font-bold text-slate-800">Action</th>
@@ -35,18 +34,8 @@
                   </span>
                 </td>
                 <td class="px-4 py-4 text-center">
-                  <span class="badge bg-success">
-                    <i class="fas fa-check mr-1"></i>{{ $stats['lapanganAktif'] }}
-                  </span>
-                </td>
-                <td class="px-4 py-4 text-center">
                   <span class="badge bg-info">
                     <i class="fas fa-calendar mr-1"></i>{{ $stats['boking'] }}
-                  </span>
-                </td>
-                <td class="px-4 py-4 text-center">
-                  <span class="badge bg-success" style="background: linear-gradient(135deg, #10b981, #059669) !important;">
-                    <i class="fas fa-check-double mr-1"></i>{{ $stats['bokingConfirmed'] }}
                   </span>
                 </td>
                 <td class="px-4 py-4 text-center">
@@ -58,11 +47,6 @@
                   <span class="badge bg-secondary">
                     <i class="fas fa-images mr-1"></i>{{ $stats['sliders'] }}
                   </span>
-                </td>
-                <td class="px-4 py-4 text-center">
-                  <a href="{{ route('admin.dashboard.region', ['region' => $regionCode]) }}" class="btn btn-sm btn-outline-primary transition hover:shadow-md">
-                    <i class="fas fa-eye mr-1"></i>Lihat
-                  </a>
                 </td>
               </tr>
               @empty

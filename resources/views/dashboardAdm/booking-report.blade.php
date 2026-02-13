@@ -63,8 +63,8 @@
 
                     <div class="col-md-2 d-grid">
                         <label class="form-label">&nbsp;</label>
-                        <button class="btn btn-secondary">
-                            <i class="fas fa-download me-1"></i>Export
+                        <button class="btn btn-secondary" type="button" id="exportBtn">
+                            <i class="fas fa-download me-1"></i>Export Excel
                         </button>
                     </div>
                 </div>
@@ -88,9 +88,10 @@
                                 <th>Nama Customer</th>
                                 <th>Lapangan</th>
                                 <th>Tanggal</th>
+                                <th>Jam</th>
                                 <th>Region</th>
+                                <th>Harga</th>
                                 <th>Status</th>
-                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -100,10 +101,14 @@
                                 <td>{{ $booking->customer->nama ?? $booking->nama ?? 'N/A' }}</td>
                                 <td>{{ $booking->lapanganData->namaLapangan ?? 'N/A' }}</td>
                                 <td>{{ $booking->tanggal }}</td>
+                                <td>{{ $booking->jam_mulai ?? 'N/A' }} - {{ $booking->jam_selesai ?? 'N/A' }}</td>
                                 <td>
                                     <span class="badge bg-info">
                                         {{ $booking->region ?? 'N/A' }}
                                     </span>
+                                </td>
+                                <td class="fw-bold text-success">
+                                    Rp {{ number_format($booking->total_harga, 0, ',', '.') ?? 'N/A' }}
                                 </td>
                                 <td>
                                     @if($booking->status === 'confirmed')
@@ -114,15 +119,10 @@
                                         <span class="badge bg-danger">Paid</span>
                                     @endif
                                 </td>
-                                <td>
-                                    <a href="javascript:void(0)" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted">
+                                <td colspan="9" class="text-center text-muted">
                                     <i class="fas fa-inbox me-1"></i> Tidak ada booking
                                 </td>
                             </tr>
@@ -143,3 +143,25 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    document.getElementById('exportBtn').addEventListener('click', function() {
+        // Get filter values
+        const status = document.getElementById('statusFilter').value;
+        const region = document.getElementById('regionFilter').value;
+        const dateFrom = document.getElementById('dateFrom').value;
+        const dateTo = document.getElementById('dateTo').value;
+        
+        // Build query string
+        let query = '?';
+        if(status) query += 'status=' + status + '&';
+        if(region) query += 'region=' + region + '&';
+        if(dateFrom) query += 'date_from=' + dateFrom + '&';
+        if(dateTo) query += 'date_to=' + dateTo;
+        
+        // Redirect to export endpoint
+        window.location.href = '{{ route("admin.booking.export") }}' + query;
+    });
+</script>
+@endpush

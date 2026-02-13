@@ -10,9 +10,11 @@ use App\Models\Event;
 use App\Models\Slider;
 use App\Models\Admin;
 use App\Models\Payment;
+use App\Exports\BookingsExport;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DashboardController extends Controller
 {
@@ -524,16 +526,30 @@ class DashboardController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        // Ambil customer dengan status pembayaran 'paid'
+        // Ambil customer dengan status pembayaran 'paid' beserta relasi bokings
         $paidUsers = Costumers::where('payment_status', 'paid')
+            ->with('bokings')
             ->orderByDesc('created_at')
             ->get();
 
         $totalPaid = $paidUsers->count();
+        
+        // Group paid users by region untuk stats
+        $paidUsersByRegion = [];
+        foreach ($paidUsers as $user) {
+            $userRegions = $user->bokings->pluck('region')->unique();
+            foreach ($userRegions as $region) {
+                if (!isset($paidUsersByRegion[$region])) {
+                    $paidUsersByRegion[$region] = 0;
+                }
+                $paidUsersByRegion[$region]++;
+            }
+        }
 
         return view('dashboardAdm.master.users-paid', [
             'users' => $paidUsers,
             'totalPaid' => $totalPaid,
+            'paidUsersByRegion' => $paidUsersByRegion,
         ]);
     }
 
@@ -716,5 +732,29 @@ class DashboardController extends Controller
             'regionLabel' => $regionLabel,
             'totalBookings' => $bookings->count(),
         ]);
+    }
+
+    /**
+     * Export Bookings to Excel
+     */
+    public function exportBookings()
+    {
+        // Check if user is authenticated as admin
+        if (!Auth::guard('admin')->check()) {
+            return redirect()->route('admin.login');
+        }
+
+        // Get filters from request
+        $filters = [
+            'status' => request('status', ''),
+            'region' => request('region', ''),
+            'date_from' => request('date_from', ''),
+            'date_to' => request('date_to', ''),
+        ];
+
+        // Generate filename with timestamp
+        $filename = 'booking-lapangan-' . date('d-m-Y-H-i-s') . '.xlsx';
+
+        return Excel::download(new BookingsExport($filters), $filename);
     }
 }

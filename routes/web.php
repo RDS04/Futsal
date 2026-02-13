@@ -83,6 +83,7 @@ Route::middleware(['auth.admin'])->prefix('admin')->group(function () {
         // New separated dashboard pages (only for master admin)
         Route::get('/statistics', 'statistics')->name('admin.statistics')->middleware('admin.master');
         Route::get('/booking-report', 'bookingReport')->name('admin.booking.report')->middleware('admin.master');
+        Route::get('/booking-report/export', 'exportBookings')->name('admin.booking.export')->middleware('admin.master');
         Route::get('/admin-list', 'adminList')->name('admin.list')->middleware('admin.master');
         
         // Master Data - All Regions

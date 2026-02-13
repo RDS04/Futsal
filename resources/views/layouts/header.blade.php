@@ -485,65 +485,44 @@
             <!-- User Menu -->
             <li class="nav-item dropdown user-menu">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" title="User Menu">
-                    <img src="{{ asset('adminlte/assets/img/user2-160x160.jpg') }}" class="user-image rounded-circle shadow" alt="User Image" />
+                    <img src="{{ asset('static/img/logo.png') }}" class="user-image rounded-circle shadow" alt="User Image" />
                     @if($admin)
-                        <span class="d-none d-md-inline">
-                            @if($isMaster)
-                                <i class="bi bi-star-fill text-warning me-1"></i>{{ $admin->name ?? 'Master Admin' }}
-                            @else
-                                <i class="bi bi-geo-fill text-info me-1"></i>{{ $admin->name ?? 'Admin Regional' }}
-                            @endif
+                        <span class="d-none d-md-inline ms-2">
+                            {{ $admin->name ?? 'Admin' }}
                         </span>
-                    @else
-                        <span class="d-none d-md-inline">Guest</span>
                     @endif
                 </a>
 
-                <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                    <li class="user-header {{ $isMaster ? 'text-bg-warning' : 'text-bg-info' }}">
-                        <img src="{{ asset('adminlte/assets/img/user2-160x160.jpg') }}" class="rounded-circle shadow" alt="User Image" />
-                        <p>
-                            @if($admin)
-                                {{ $admin->name ?? 'Admin User' }}
-                                <small>
+                <ul class="dropdown-menu dropdown-menu-end" style="width: 300px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    <li style="padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px 10px 0 0; color: white;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <img src="{{ asset('static/img/logo.png') }}" style="width: 50px; height: 50px; border-radius: 50%; border: 3px solid white;" alt="User Image" />
+                            <div>
+                                <p style="margin: 0; font-weight: 600;">{{ $admin->name ?? 'Admin' }}</p>
+                                <small style="opacity: 0.9;">
                                     @if($isMaster)
-                                        ⭐ Master Administrator
+                                        Master Admin
                                     @else
-                                        📍 Admin {{ ucfirst($region) }}
+                                        Regional Admin
                                     @endif
                                 </small>
-                            @else
-                                Guest User
-                                <small>Not Authenticated</small>
-                            @endif
-                        </p>
-                    </li>
-
-                    <li class="user-body">
-                        <div class="row">
-                            @if($admin)
-                            <div class="col-12 text-center py-2 border-bottom">
-                                <small class="text-muted">
-                                    <i class="bi bi-envelope me-1"></i>{{ $admin->email }}
-                                </small>
                             </div>
-                            @endif
                         </div>
                     </li>
 
-                    <li class="user-footer">
-                        <a href="{{ route('admin.profile') }}" class="btn btn-default btn-flat">
-                            <i class="bi bi-person me-1"></i>Profile
+                    @if($admin)
+                    @endif
+
+                    <li style="padding: 0.5rem;">
+                        <a href="{{ route('logout') }}" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="padding: 0.6rem 1rem; border-radius: 6px; transition: all 0.2s;">
+                            <i class="bi bi-box-arrow-right me-2" style="color: #dc3545;"></i>Sign out
                         </a>
-                        <a href="{{ route('logout') }}" class="btn btn-default btn-flat float-end"
-                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            <i class="bi bi-box-arrow-right me-1"></i>Sign out
-                        </a>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                            @csrf
-                        </form>
                     </li>
                 </ul>
+                
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                    @csrf
+                </form>
             </li>
         </ul>
     </div>

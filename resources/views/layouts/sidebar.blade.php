@@ -195,12 +195,6 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('admin.users.list') }}" class="nav-link">
-                                <i class="nav-icon bi bi-people-fill"></i>
-                                <p>Akun User</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a href="{{ route('admin.users.paid') }}" class="nav-link">
                                 <i class="nav-icon bi bi-cash-coin"></i>
                                 <p>User Sudah Bayar</p>
